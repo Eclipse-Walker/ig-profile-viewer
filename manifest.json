@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "IG Profile Viewer",
   "description": "the Chrome extension that makes viewing Instagram profile pictures easier and more convenient! With IG Profile Viewer, you can view Instagram profile pictures in full size without needing to download the image or use external tools.",
-  "version": "0.0.3.4",
+  "version": "0.0.4.4",
   "action": {
     "default_title": "IG full size profile picture"
   },
