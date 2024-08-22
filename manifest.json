@@ -8,9 +8,7 @@
   },
   "author": "Eclipse-Walker",
   "permissions": [
-    "tabs",
     "contextMenus",
-    "webRequest",
     "declarativeNetRequest"
   ],
   "declarative_net_request": {
