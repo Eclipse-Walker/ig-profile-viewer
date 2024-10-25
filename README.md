@@ -11,6 +11,14 @@ Using IG Profile Viewer is both easy and convenient. Simply install this extensi
   - Easy to Use: Quick installation and immediate functionality with no hassle.
   - No Ads: No interruptions from advertisements or special offers.
 
+## Supported Platforms
+Our extension currently supports the following platforms:
+1. **Instagram**
+1. **TikTok**
+
+Stay tuned for more platforms in the future!
+
+
 ## Installation
 Chrome Web Store  [IG Profile Viewer](https://chromewebstore.google.com/detail/ig-profile-viewer/lejkiphccnemcedcpiohmojhmleigekk)
 
