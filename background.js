@@ -14,6 +14,8 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
           console.log(JSON.stringify(url));
           if (url.includes("instagram.com")) {
             getInstagramProfilePicture(url);
+          } else if (url.includes("tiktok.com")) {
+            getTiktokProfilePicture(url);
           }
         } else {
           console.error("Tab or URL is undefined");
@@ -27,6 +29,7 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
   }
 });
 
+// Instagram
 function getInstagramProfilePicture(url) {
   getInstagramUser(url).then(getInstagramUserId).then(openInstagramFullHDPhoto);
 }
@@ -96,4 +99,54 @@ function openInstagramFullHDPhoto(instagram_user_id) {
         resolve(url);
       });
   });
+}
+
+// Tiktok
+function getTiktokProfilePicture(url) {
+  getTiktokUsername(url)
+    .then(getTiktokProfilePictureUrl)
+    .then(openTiktokFullHDPhoto);
+}
+
+function getTiktokUsername(link) {
+  return new Promise((resolve, reject) => {
+    let regex = /(?<=tiktok.com\/)@[a-zA-z0-9.]*/;
+    let username = link.match(regex)[0];
+    console.log("TikTok Username: " + username);
+    resolve(username);
+  });
+}
+
+function getTiktokProfilePictureUrl(username) {
+  return new Promise((resolve, reject) => {
+    let url = `https://www.tiktok.com/${username}`;
+    fetch(url)
+      .then((response) => {
+        return response.text();
+      })
+      .then((html) => {
+        let regex = /(?<=avatarLarger":").+?(?=","avatarMedium)/;
+        let profile_picture_encoded = html.match(regex)[0];
+        let profile_picture_url = decodeURIComponent(
+          JSON.parse(`"${profile_picture_encoded}"`)
+        );
+        console.log(profile_picture_url);
+        resolve(profile_picture_url);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject(err);
+      });
+  });
+}
+
+function openTiktokFullHDPhoto(url) {
+  return new Promise((resolve, reject) => {
+    openTab(url);
+    resolve(url);
+  });
+}
+
+function openTab(url) {
+  chrome.tabs.create({ url: url });  
 }

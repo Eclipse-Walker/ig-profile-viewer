@@ -11,6 +11,14 @@ Using IG Profile Viewer is both easy and convenient. Simply install this extensi
   - Easy to Use: Quick installation and immediate functionality with no hassle.
   - No Ads: No interruptions from advertisements or special offers.
 
+## Supported Platforms
+Our extension currently supports the following platforms:
+1. **Instagram**
+1. **TikTok**
+
+Stay tuned for more platforms in the future!
+
+
 ## Installation
 Chrome Web Store  [IG Profile Viewer](https://chromewebstore.google.com/detail/ig-profile-viewer/lejkiphccnemcedcpiohmojhmleigekk)
 
@@ -29,3 +37,15 @@ the Chrome extension that makes viewing Instagram profile pictures easier and mo
 Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 105.0.0.11.118 (iPhone11,8; iOS 12_3_1; en_US; en-US; scale=2.00; 828x1792; 165586599)
 ```
 ---
+
+## ⚙️How to build package
+#### Grant Execution Permission
+Open terminal and give execution permission to the script:
+
+Bash `chmod +x buildscripts/build_package.sh`
+
+#### Build Package
+Run the script with the command:
+
+Bash `bash buildscripts/build_package.sh`
+
