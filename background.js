@@ -5,6 +5,34 @@ chrome.runtime.onInstalled.addListener(function () {
   });
 });
 
+function getCurrentTab() {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else if (tabs.length === 0) {
+        reject(new Error("No active tab found."));
+      } else {
+        resolve(tabs[0]);
+      }
+    });
+  });
+}
+
+//MARK:OneClick
+chrome.action.onClicked.addListener(() => {
+  getCurrentTab()
+    .then((tab) => {
+      const url = tab.url;
+      console.log(`download: ${url}`);
+      oneClickSaveProfilePictureIG(url);
+    })
+    .catch((error) => {
+      console.error("Error getting current tab:", error);
+    });
+});
+
+//MARK:Context
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   switch (info.menuItemId) {
     case "parent":
@@ -29,9 +57,15 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
   }
 });
 
-// Instagram
+//MARK:Instagram
 function getInstagramProfilePicture(url) {
   getInstagramUser(url).then(getInstagramUserId).then(openInstagramFullHDPhoto);
+}
+
+function oneClickSaveProfilePictureIG(url) {
+  getInstagramUser(url)
+    .then(getInstagramUserId)
+    .then(downloadInstagramFullHDPhoto);
 }
 
 function getInstagramUser(link) {
@@ -101,7 +135,31 @@ function openInstagramFullHDPhoto(instagram_user_id) {
   });
 }
 
-// Tiktok
+function downloadInstagramFullHDPhoto(instagram_user_id) {
+  return new Promise((resolve, reject) => {
+    modifyHeaders(
+      "Mozilla/5.0 (Linux; Android 9; GM1903 Build/PKQ1.190110.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/75.0.3770.143 Mobile Safari/537.36 Instagram 103.1.0.15.119 Android (28/9; 420dpi; 1080x2260; OnePlus; GM1903; OnePlus7; qcom; sv_SE; 164094539)"
+    );
+    let url = `https://i.instagram.com/api/v1/users/${instagram_user_id}/info/`;
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((out) => {
+        let imageUrl = out.user.hd_profile_pic_url_info.url;
+
+        chrome.downloads.download({
+          url: imageUrl,
+          filename: `${out.user.username}.jpg`,
+          saveAs: true,
+        });
+
+        resolve(imageUrl);
+      })
+      .catch((error) => reject(error));
+  });
+}
+
+//MARK:Tiktok
 function getTiktokProfilePicture(url) {
   getTiktokUsername(url)
     .then(getTiktokProfilePictureUrl)
@@ -148,5 +206,5 @@ function openTiktokFullHDPhoto(url) {
 }
 
 function openTab(url) {
-  chrome.tabs.create({ url: url });  
+  chrome.tabs.create({ url: url });
 }
