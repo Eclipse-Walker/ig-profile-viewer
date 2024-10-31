@@ -1,3 +1,5 @@
+let tiktokProfile = "";
+
 chrome.runtime.onInstalled.addListener(function () {
   chrome.contextMenus.create({
     title: "IG Profile Viewer",
@@ -25,14 +27,18 @@ chrome.action.onClicked.addListener(() => {
     .then((tab) => {
       const url = tab.url;
       console.log(`download: ${url}`);
-      oneClickSaveProfilePictureIG(url);
+      if (url.includes("instagram.com")) {
+        oneClickSaveProfilePictureIG(url);
+      } else if (url.includes("tiktok.com")) {
+        oneClickSaveProfilePictureTiktok(url);
+      }
     })
     .catch((error) => {
       console.error("Error getting current tab:", error);
     });
 });
 
-//MARK:Context
+//MARK:Context menu
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   switch (info.menuItemId) {
     case "parent":
@@ -166,11 +172,18 @@ function getTiktokProfilePicture(url) {
     .then(openTiktokFullHDPhoto);
 }
 
+function oneClickSaveProfilePictureTiktok(url) {
+  getTiktokUsername(url)
+    .then(getTiktokProfilePictureUrl)
+    .then(downloadTiktokFullHDPhoto);
+}
+
 function getTiktokUsername(link) {
   return new Promise((resolve, reject) => {
     let regex = /(?<=tiktok.com\/)@[a-zA-z0-9.]*/;
     let username = link.match(regex)[0];
     console.log("TikTok Username: " + username);
+    tiktokProfile = username;
     resolve(username);
   });
 }
@@ -202,6 +215,26 @@ function openTiktokFullHDPhoto(url) {
   return new Promise((resolve, reject) => {
     openTab(url);
     resolve(url);
+  });
+}
+
+function downloadTiktokFullHDPhoto(url) {
+  return new Promise((resolve, reject) => {
+    fetch(url)
+      .then((out) => {
+        chrome.downloads.download(
+          {
+            url: url,
+            filename: `${tiktokProfile.replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`,
+            saveAs: true,
+          },
+          () => {
+            resolve(url);
+            tiktokProfile = "";
+          }
+        );
+      })
+      .catch((error) => reject(error));
   });
 }
 
