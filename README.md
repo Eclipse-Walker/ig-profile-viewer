@@ -1,12 +1,12 @@
+[![Update Version](https://github.com/Eclipse-Walker/ig-profile-viewer/actions/workflows/update-version.yml/badge.svg)](https://github.com/Eclipse-Walker/ig-profile-viewer/actions/workflows/update-version.yml)
+[![Bump Version](https://github.com/Eclipse-Walker/ig-profile-viewer/actions/workflows/bump-version.yml/badge.svg)](https://github.com/Eclipse-Walker/ig-profile-viewer/actions/workflows/bump-version.yml)
+
 ## IG Profile Viewer ⭐️⭐️⭐️⭐️⭐️
 
 IG Profile Viewer: Conveniently View Instagram Profile Pictures
-
 If you enjoy exploring Instagram profiles and want to see profile pictures in full size without using external tools or downloading the image, IG Profile Viewer is the solution you’ve been looking for!
 
 Using IG Profile Viewer is both easy and convenient. Simply install this extension on your Chrome browser, and then you can click on any Instagram profile to view its profile picture in full size with just a few clicks. This ensures you don’t miss any of the small details in important profile pictures.
-
-> 🔹 Pros:
   - Convenience: View profile pictures in large size immediately without needing to download or use additional tools.
   - Easy to Use: Quick installation and immediate functionality with no hassle.
   - No Ads: No interruptions from advertisements or special offers.
@@ -20,7 +20,11 @@ Stay tuned for more platforms in the future!
 
 
 ## Installation
-Chrome Web Store  [IG Profile Viewer](https://chromewebstore.google.com/detail/ig-profile-viewer/lejkiphccnemcedcpiohmojhmleigekk)
+Chrome Web Store [IG Profile Viewer](https://chromewebstore.google.com/detail/ig-profile-viewer/lejkiphccnemcedcpiohmojhmleigekk)
+
+<a href="https://chromewebstore.google.com/detail/ig-profile-viewer/lejkiphccnemcedcpiohmojhmleigekk">
+    <img src="icons/assets/available_chrome_web_store.png" alt="IG Profile Viewer" width="200">
+</a>
 
 ![ig-profile-viewer](showcases/ig-profile-viewer.png)
 
@@ -49,3 +53,18 @@ Run the script with the command:
 
 Bash `bash buildscripts/build_package.sh`
 
+---
+
+```
+ /$$$$$$$$           /$$ /$$                                       /$$      /$$           /$$ /$$                          
+| $$_____/          | $$|__/                                      | $$  /$ | $$          | $$| $$                          
+| $$        /$$$$$$$| $$ /$$  /$$$$$$   /$$$$$$$  /$$$$$$         | $$ /$$$| $$  /$$$$$$ | $$| $$   /$$  /$$$$$$   /$$$$$$ 
+| $$$$$    /$$_____/| $$| $$ /$$__  $$ /$$_____/ /$$__  $$ /$$$$$$| $$/$$ $$ $$ |____  $$| $$| $$  /$$/ /$$__  $$ /$$__  $$
+| $$__/   | $$      | $$| $$| $$  \ $$|  $$$$$$ | $$$$$$$$|______/| $$$$_  $$$$  /$$$$$$$| $$| $$$$$$/ | $$$$$$$$| $$  \__/
+| $$      | $$      | $$| $$| $$  | $$ \____  $$| $$_____/        | $$$/ \  $$$ /$$__  $$| $$| $$_  $$ | $$_____/| $$      
+| $$$$$$$$|  $$$$$$$| $$| $$| $$$$$$$/ /$$$$$$$/|  $$$$$$$        | $$/   \  $$|  $$$$$$$| $$| $$ \  $$|  $$$$$$$| $$      
+|________/ \_______/|__/|__/| $$____/ |_______/  \_______/        |__/     \__/ \_______/|__/|__/  \__/ \_______/|__/      
+                            | $$                                                                                           
+                            | $$                                                                                           
+                            |__/                                                                                           
+```
