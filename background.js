@@ -156,7 +156,7 @@ function downloadInstagramFullHDPhoto(instagram_user_id) {
         chrome.downloads.download({
           url: imageUrl,
           filename: `${out.user.username}.jpg`,
-          saveAs: true,
+          saveAs: false,
         });
 
         resolve(imageUrl);
@@ -226,7 +226,7 @@ function downloadTiktokFullHDPhoto(url) {
           {
             url: url,
             filename: `${tiktokProfile.replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`,
-            saveAs: true,
+            saveAs: false,
           },
           () => {
             resolve(url);
