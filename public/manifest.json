@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "IG Profile Viewer",
+  "version": "1.0.0",
+  "description": "the Chrome extension that makes viewing Instagram profile pictures easier and more convenient!",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "ig/tiktok full size profile picture"
+  },
+  "permissions": [
+    "contextMenus",
+    "declarativeNetRequest",
+    "downloads",
+    "tabs"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      },
+      {
+        "id": "ruleset_2",
+        "enabled": true,
+        "path": "rule.json"
+      }
+    ]
+  },
+  "host_permissions": [
+    "https://*.instagram.com/*",
+    "https://www.instagram.com/*",
+    "*://www.tiktok.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "homepage_url": "https://github.com/Eclipse-Walker/ig-profile-viewer",
+  "icons": {
+    "16": "icons/instagram16.png",
+    "19": "icons/instagram19.png",
+    "32": "icons/instagram32.png",
+    "48": "icons/instagram48.png",
+    "128": "icons/instagram128.png"
+  }
+}
