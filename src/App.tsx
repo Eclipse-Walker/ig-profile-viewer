@@ -175,8 +175,8 @@ function App() {
 
   const handleViewProfile = async (url?: string) => {
     const targetUrl = url || currentTab?.url
-    if (!targetUrl) {
-      setError('No URL available')
+    if (!targetUrl || loading) {
+      if (!targetUrl) setError('No URL available')
       return
     }
 
@@ -198,13 +198,11 @@ function App() {
       let actualUsername: string
 
       if (platform === 'instagram') {
-        // Get Instagram profile picture
         const userId = await getInstagramUserId(username)
         const result = await getInstagramProfilePicUrl(userId)
         profilePicUrl = result.url
         actualUsername = result.username
       } else if (platform === 'tiktok') {
-        // Get TikTok profile picture
         profilePicUrl = await getTikTokProfilePicUrl(username)
         actualUsername = username
       } else {
@@ -214,15 +212,14 @@ function App() {
       // Open the profile picture in a new tab
       chrome.tabs.create({ url: profilePicUrl })
 
-      // Show success message and profile data
-      setError(`✅ Profile picture opened in new tab!`)
-      
+      // Set profile data and success message
       setProfileData({
         url: targetUrl,
         username: actualUsername,
         profilePicUrl: profilePicUrl,
         platform: platform
       })
+      setError(`✅ Profile picture opened in new tab!`)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -232,8 +229,8 @@ function App() {
 
   const handleDownload = async (url?: string) => {
     const targetUrl = url || currentTab?.url
-    if (!targetUrl) {
-      setError('No URL available')
+    if (!targetUrl || loading) {
+      if (!targetUrl) setError('No URL available')
       return
     }
 
@@ -255,13 +252,11 @@ function App() {
       let actualUsername: string
 
       if (platform === 'instagram') {
-        // Get Instagram profile picture
         const userId = await getInstagramUserId(username)
         const result = await getInstagramProfilePicUrl(userId)
         profilePicUrl = result.url
         actualUsername = result.username
       } else if (platform === 'tiktok') {
-        // Get TikTok profile picture
         profilePicUrl = await getTikTokProfilePicUrl(username)
         actualUsername = username.replace(/[^a-zA-Z0-9_-]/g, "")
       } else {
@@ -271,16 +266,14 @@ function App() {
       // Download the profile picture
       await downloadImage(profilePicUrl, `${actualUsername}.jpg`)
 
-      // Show success message
-      setError(`✅ Profile picture downloaded successfully!`)
-      
-      // Also set profile data for preview
+      // Set profile data and success message
       setProfileData({
         url: targetUrl,
         username: actualUsername,
         profilePicUrl: profilePicUrl,
         platform: platform
       })
+      setError(`✅ Profile picture downloaded successfully!`)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -288,9 +281,13 @@ function App() {
     }
   }
 
+  const openInNewTab = (url: string) => {
+    chrome.tabs.create({ url })
+  }
+
   const handleCustomUrl = () => {
-    if (!customUrl.trim()) {
-      setError('Please enter a valid URL')
+    if (!customUrl.trim() || loading) {
+      if (!customUrl.trim()) setError('Please enter a valid URL')
       return
     }
     const platform = detectPlatform(customUrl)
@@ -299,10 +296,6 @@ function App() {
       return
     }
     handleViewProfile(customUrl)
-  }
-
-  const openInNewTab = (url: string) => {
-    chrome.tabs.create({ url })
   }
 
   return (
@@ -376,10 +369,10 @@ function App() {
           </div>
         )}
 
-        {/* Profile data display */}
-        {profileData && (
-          <div className="profile-result">
-            <h3>Profile Picture</h3>
+        {/* Profile data display - Always show placeholder to prevent layout shift */}
+        <div className="profile-result">
+          <h3>Profile Picture</h3>
+          {profileData ? (
             <div className="profile-card">
               <img 
                 src={profileData.profilePicUrl} 
@@ -387,7 +380,7 @@ function App() {
                 className="profile-image"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none'
-                  setError('Failed to load profile image')
+                  // setError('Failed to load profile image')
                 }}
               />
               <div className="profile-info">
@@ -396,12 +389,14 @@ function App() {
                 <div className="button-group">
                   <button 
                     onClick={() => openInNewTab(profileData.profilePicUrl)}
+                    disabled={loading}
                     className="btn btn-outline"
                   >
                     🔗 Open in New Tab
                   </button>
                   <button 
                     onClick={() => handleDownload(profileData.url)}
+                    disabled={loading}
                     className="btn btn-secondary"
                   >
                     ⬇️ Download
@@ -409,8 +404,12 @@ function App() {
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="profile-placeholder">
+              Profile picture will appear here after processing
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -43,6 +43,8 @@ body {
 /* Content area */
 .content {
   padding: 20px;
+  height: 500px;
+  overflow-y: auto;
 }
 
 /* Current tab section */
@@ -122,7 +124,6 @@ body {
   border: 1px solid #ced4da;
   border-radius: 6px;
   font-size: 14px;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 .url-input:focus {
@@ -135,7 +136,7 @@ body {
   color: #6c757d;
 }
 
-/* Button styles */
+/* Button styles - NO TRANSITIONS */
 .btn {
   padding: 10px 16px;
   border: none;
@@ -143,12 +144,12 @@ body {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .btn:disabled {
@@ -161,19 +162,9 @@ body {
   color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
 .btn-secondary {
   background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
   color: white;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
 }
 
 .btn-outline {
@@ -193,13 +184,16 @@ body {
   flex-wrap: wrap;
 }
 
-/* Message styles */
+/* Message styles - Static height */
 .message {
   padding: 12px 16px;
   border-radius: 6px;
   font-size: 14px;
   margin-bottom: 16px;
   border: 1px solid transparent;
+  height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .message.error {
@@ -214,11 +208,12 @@ body {
   border-color: #c3e6cb;
 }
 
-/* Profile result section */
+/* Profile result section - Reserved space to prevent layout shift */
 .profile-result {
   margin-top: 20px;
   border-top: 1px solid #e9ecef;
   padding-top: 20px;
+  min-height: 200px;
 }
 
 .profile-result h3 {
@@ -232,6 +227,7 @@ body {
   display: flex;
   gap: 16px;
   align-items: flex-start;
+  min-height: 120px;
 }
 
 .profile-image {
@@ -262,6 +258,19 @@ body {
   margin-top: 12px;
 }
 
+/* Profile placeholder when no data */
+.profile-placeholder {
+  margin-top: 20px;
+  border-top: 1px solid #e9ecef;
+  padding-top: 20px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
 /* Responsive design */
 @media (max-width: 450px) {
   .app {
@@ -282,20 +291,16 @@ body {
   }
 }
 
-/* Loading states */
-.btn:disabled {
-  position: relative;
-}
-
+/* Loading states - Simple spinner */
 .btn:disabled::after {
   content: '';
-  position: absolute;
   width: 16px;
   height: 16px;
   border: 2px solid transparent;
   border-top: 2px solid currentColor;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  margin-left: 8px;
 }
 
 @keyframes spin {
@@ -305,19 +310,14 @@ body {
 
 /* Accessibility */
 .btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
 }
 
 .url-input:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Smooth transitions */
-* {
-  transition: all 0.15s ease-in-out;
 }
 
 /* Scrollbar styling */
