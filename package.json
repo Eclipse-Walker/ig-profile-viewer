@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:package": "node scripts/update-manifest-version.js && npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
