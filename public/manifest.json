@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "IG Profile Viewer",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "the Chrome extension that makes viewing Instagram profile pictures easier and more convenient!",
   "action": {
     "default_popup": "index.html",
