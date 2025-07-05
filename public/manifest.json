@@ -19,6 +19,11 @@
         "id": "rule",
         "enabled": true,
         "path": "rule.json"
+      },
+      {
+        "id": "rule-sub",
+        "enabled": true,
+        "path": "rule-sub.json"
       }
     ]
   },
