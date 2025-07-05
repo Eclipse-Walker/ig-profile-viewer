@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant U as User
+    participant P as React Popup
+    participant B as Background Script
+    participant T as Chrome Tab
+    participant D as Downloads
+    
+    Note over U,D: Fixed View Profile Flow
+    U->>P: Click "View Profile"
+    P->>P: Extract username from URL
+    P->>B: sendMessage("viewProfile", {url, platform, username})
+    B->>B: getInstagramUser(url)
+    B->>B: getInstagramUserId(username)
+    B->>B: getInstagramFullHDPhoto(userId)
+    B->>T: chrome.tabs.create({url: profilePicUrl})
+    B->>P: {profilePicUrl, username, success: true}
+    P->>P: Show "✅ Profile picture opened in new tab!"
+    P->>P: Display profile preview
+    
+    Note over U,D: Fixed Download Flow
+    U->>P: Click "Download"
+    P->>P: Extract username from URL
+    P->>B: sendMessage("downloadProfile", {url, platform, username})
+    B->>B: oneClickSaveProfilePictureIG(url)
+    B->>B: getInstagramUser(url)
+    B->>B: getInstagramUserId(username)
+    B->>B: downloadInstagramFullHDPhoto(userId)
+    B->>D: chrome.downloads.download({url, filename})
+    B->>P: {success: true, message: "Downloaded successfully!"}
+    P->>P: Show "✅ Profile picture downloaded successfully!"

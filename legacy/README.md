@@ -23,10 +23,10 @@ Stay tuned for more platforms in the future!
 Chrome Web Store [IG Profile Viewer](https://chromewebstore.google.com/detail/ig-profile-viewer/lejkiphccnemcedcpiohmojhmleigekk)
 
 <a href="https://chromewebstore.google.com/detail/ig-profile-viewer/lejkiphccnemcedcpiohmojhmleigekk">
-    <img src="/src/assets/available_chrome_web_store.png" alt="IG Profile Viewer" width="200">
+    <img src="icons/assets/available_chrome_web_store.png" alt="IG Profile Viewer" width="200">
 </a>
 
-![ig-profile-viewer](/legacy/showcases/ig-profile-viewer.png)
+![ig-profile-viewer](showcases/ig-profile-viewer.png)
 
 ---
 the Chrome extension that makes viewing Instagram profile pictures easier and more convenient! With IG Profile Viewer, you can view Instagram profile pictures in full size without needing to download the image or use external tools
@@ -68,7 +68,3 @@ Bash `bash buildscripts/build_package.sh`
                             | $$                                                                                           
                             |__/                                                                                           
 ```
-
-
-### Sequence Diagram
-[![](https://mermaid.ink/img/pako:eNqtVEtu2zAUvArLlQuohmLFH3GRhaOmNdAWQhJ3UXjDUM82EUlUScqfGF72Fj1dT9JHKVKcGGlStF7YkjkczZsZcUeFSoAyauB7CbmASPKF5tksJ_gpuLZSyILnlkwJN2RqQB8vxW7pErjAS1WUxTFi7BBjLm4XWpV5Qq6EloU9xl073PlSqwzINb85BkQOEKl1niqemHq9_v6iLBC1Ak2mXsTIhdxAQr5KWJNYq7lMgVykal1jp-_OzmJGzlMpbsmMHqJmtIbENeT9xmo3V4mD5xxVzVEbmV5-ekCNGTGQJ5_BGL6AzoyukK5l88iu1KlHipTbudKZ11Lt39Yc45pjAXaSG1u572zu4LY_IyZJp-F6HnhRpunHKF4qqyr0JDnAXjMiKrO7lt-YrtDALXScYEaKeoJYiqlOD7WiK7tHiw8jecSUQqARjFhdwv6RlVdLtUazf_380SZSSGFLjbEVkGNaMic5JoFa3jyJIZIGDdw2ovAXnMsv5t805fnsG8R_yD25p_r77FUOlZ4rvoK4tdZZM_nwcg_-oSmN5NfVJWrr0uwz7VWnHtVJfzqgK8yjXngkq01jBwFgWvegOWrYYgNeXZ_kWQrq0YWWCWXVY2kGOuPulu4c94zaJWQYlNORcH3rSrDHPXjUfFMqa7bhmbVYUjbnqcG7skjwLbk_J9t_NVYB9Dmebpay0zCsSCjb0Q1lvVO_G44God8P_GDkn4ZDj24pC3vd0PdP-oPR8CQYhYPh3qN31WP97vBkFIbDIAiDoD_s93r734oI3Fc?type=png)](https://mermaid.live/edit#pako:eNqtVEtu2zAUvArLlQuohmLFH3GRhaOmNdAWQhJ3UXjDUM82EUlUScqfGF72Fj1dT9JHKVKcGGlStF7YkjkczZsZcUeFSoAyauB7CbmASPKF5tksJ_gpuLZSyILnlkwJN2RqQB8vxW7pErjAS1WUxTFi7BBjLm4XWpV5Qq6EloU9xl073PlSqwzINb85BkQOEKl1niqemHq9_v6iLBC1Ak2mXsTIhdxAQr5KWJNYq7lMgVykal1jp-_OzmJGzlMpbsmMHqJmtIbENeT9xmo3V4mD5xxVzVEbmV5-ekCNGTGQJ5_BGL6AzoyukK5l88iu1KlHipTbudKZ11Lt39Yc45pjAXaSG1u572zu4LY_IyZJp-F6HnhRpunHKF4qqyr0JDnAXjMiKrO7lt-YrtDALXScYEaKeoJYiqlOD7WiK7tHiw8jecSUQqARjFhdwv6RlVdLtUazf_380SZSSGFLjbEVkGNaMic5JoFa3jyJIZIGDdw2ovAXnMsv5t805fnsG8R_yD25p_r77FUOlZ4rvoK4tdZZM_nwcg_-oSmN5NfVJWrr0uwz7VWnHtVJfzqgK8yjXngkq01jBwFgWvegOWrYYgNeXZ_kWQrq0YWWCWXVY2kGOuPulu4c94zaJWQYlNORcH3rSrDHPXjUfFMqa7bhmbVYUjbnqcG7skjwLbk_J9t_NVYB9Dmebpay0zCsSCjb0Q1lvVO_G44God8P_GDkn4ZDj24pC3vd0PdP-oPR8CQYhYPh3qN31WP97vBkFIbDIAiDoD_s93r734oI3Fc)
