@@ -81,14 +81,18 @@ function modifyHeaders(headerStr) {
 //MARK:Instagram
 async function handleInstagram(url, { download }) {
   const username = parseInstagramUsername(url);
-  const userId = await getInstagramUserId(username);
-  const user = await getInstagramUserInfo(userId);
-  const imageUrl = user.hd_profile_pic_url_info.url;
+  const profile = await getInstagramWebProfile(username);
+  const imageUrl = await resolveInstagramImageUrl(profile);
+
+  if (!imageUrl) {
+    console.error("[IG] could not resolve image url; profile:", JSON.stringify(profile));
+    throw new Error("Could not resolve Instagram profile picture URL");
+  }
 
   if (download) {
     chrome.downloads.download({
       url: imageUrl,
-      filename: `${user.username}.jpg`,
+      filename: `${profile.username || username}.jpg`,
       saveAs: false,
     });
   } else {
@@ -102,17 +106,36 @@ function parseInstagramUsername(link) {
   return match[0];
 }
 
-async function getInstagramUserId(username) {
-  await modifyHeaders(IG_UA_IPHONE);
+// Fetches the public web profile. This endpoint is reliable (it rides the
+// browser's logged-in instagram.com cookies) and already carries the profile
+// picture URLs as a guaranteed fallback.
+async function getInstagramWebProfile(username) {
+  modifyHeaders(IG_UA_IPHONE);
   const url = `https://i.instagram.com/api/v1/users/web_profile_info/?username=${username}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`IG web_profile_info failed: ${res.status}`);
   const out = await res.json();
-  return out.data.user.id;
+  const user = out?.data?.user;
+  if (!user?.id) throw new Error("IG web_profile_info missing user id");
+  return user;
+}
+
+// Prefers the full-resolution image from the private mobile /info/ endpoint,
+// but falls back to the URLs already present in the web profile when /info/
+// is unavailable (e.g. private accounts or API changes).
+async function resolveInstagramImageUrl(profile) {
+  try {
+    const info = await getInstagramUserInfo(profile.id);
+    const hd = info?.hd_profile_pic_url_info?.url;
+    if (hd) return hd;
+  } catch (error) {
+    console.warn("[IG] /info/ lookup failed, falling back to web profile:", error);
+  }
+  return profile.profile_pic_url_hd || profile.profile_pic_url;
 }
 
 async function getInstagramUserInfo(userId) {
-  await modifyHeaders(IG_UA_ANDROID);
+  modifyHeaders(IG_UA_ANDROID);
   const url = `https://i.instagram.com/api/v1/users/${userId}/info/`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`IG user info failed: ${res.status}`);
