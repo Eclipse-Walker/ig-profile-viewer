@@ -3,20 +3,28 @@
 
 ## IG Profile Viewer ⭐️⭐️⭐️⭐️⭐️
 
-IG Profile Viewer: Conveniently View Instagram Profile Pictures
-If you enjoy exploring Instagram profiles and want to see profile pictures in full size without using external tools or downloading the image, IG Profile Viewer is the solution you’ve been looking for!
+IG Profile Viewer: Conveniently View & Download Instagram and TikTok Profile Pictures
+If you enjoy exploring Instagram and TikTok profiles and want to see profile pictures in full size without using external tools, IG Profile Viewer is the solution you’ve been looking for!
 
-Using IG Profile Viewer is both easy and convenient. Simply install this extension on your Chrome browser, and then you can click on any Instagram profile to view its profile picture in full size with just a few clicks. This ensures you don’t miss any of the small details in important profile pictures.
-  - Convenience: View profile pictures in large size immediately without needing to download or use additional tools.
+Using IG Profile Viewer is both easy and convenient. Simply install this extension on your Chrome browser, open any Instagram or TikTok profile, and view or download its profile picture in full size with just a few clicks. This ensures you don’t miss any of the small details in important profile pictures.
+  - Convenience: View or download profile pictures in full size immediately without needing additional tools.
   - Easy to Use: Quick installation and immediate functionality with no hassle.
   - No Ads: No interruptions from advertisements or special offers.
 
 ## Supported Platforms
 Our extension currently supports the following platforms:
 1. **Instagram**
-1. **TikTok**
+2. **TikTok**
 
 Stay tuned for more platforms in the future!
+
+## How to Use
+Open a profile page on a supported platform (e.g. `https://www.instagram.com/<username>` or `https://www.tiktok.com/@<username>`), then:
+
+  - **Left-click the extension icon** in the toolbar to **download** the full-size profile picture directly.
+  - **Right-click the page and choose "IG Profile Viewer"** from the context menu to **open** the full-size profile picture in a new tab.
+
+For Instagram, the extension fetches the highest-resolution image available, automatically falling back to the public web profile picture when the high-res endpoint is unavailable (for example, on private accounts).
 
 
 ## Installation
@@ -29,7 +37,7 @@ Chrome Web Store [IG Profile Viewer](https://chromewebstore.google.com/detail/ig
 ![ig-profile-viewer](showcases/ig-profile-viewer.png)
 
 ---
-the Chrome extension that makes viewing Instagram profile pictures easier and more convenient! With IG Profile Viewer, you can view Instagram profile pictures in full size without needing to download the image or use external tools
+the Chrome extension that makes viewing Instagram and TikTok profile pictures easier and more convenient! With IG Profile Viewer, you can view or download profile pictures in full size without needing external tools
 
 ## Any API endpoint to request user info by Instagram ID?
 
