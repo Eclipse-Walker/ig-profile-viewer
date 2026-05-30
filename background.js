@@ -1,105 +1,63 @@
-let tiktokProfile = "";
+// User-Agent strings required by Instagram's private API for each endpoint.
+const IG_UA_IPHONE =
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 105.0.0.11.118 (iPhone11,8; iOS 12_3_1; en_US; en-US; scale=2.00; 828x1792; 165586599)";
+const IG_UA_ANDROID =
+  "Mozilla/5.0 (Linux; Android 9; GM1903 Build/PKQ1.190110.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/75.0.3770.143 Mobile Safari/537.36 Instagram 103.1.0.15.119 Android (28/9; 420dpi; 1080x2260; OnePlus; GM1903; OnePlus7; qcom; sv_SE; 164094539)";
 
-chrome.runtime.onInstalled.addListener(function () {
+chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     title: "IG Profile Viewer",
     id: "parent",
   });
 });
 
-function getCurrentTab() {
-  return new Promise((resolve, reject) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError);
-      } else if (tabs.length === 0) {
-        reject(new Error("No active tab found."));
-      } else {
-        resolve(tabs[0]);
-      }
-    });
-  });
+async function getCurrentTab() {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab) throw new Error("No active tab found.");
+  return tab;
+}
+
+// Routes a tab URL to the matching platform handler.
+async function handleProfilePicture(url, { download }) {
+  if (url.includes("instagram.com")) {
+    await handleInstagram(url, { download });
+  } else if (url.includes("tiktok.com")) {
+    await handleTiktok(url, { download });
+  }
 }
 
 //MARK:OneClick
-chrome.action.onClicked.addListener(() => {
-  getCurrentTab()
-    .then((tab) => {
-      const url = tab.url;
-      console.log(`download: ${url}`);
-      if (url.includes("instagram.com")) {
-        oneClickSaveProfilePictureIG(url);
-      } else if (url.includes("tiktok.com")) {
-        oneClickSaveProfilePictureTiktok(url);
-      }
-    })
-    .catch((error) => {
-      console.error("Error getting current tab:", error);
-    });
-});
-
-//MARK:Context menu
-chrome.contextMenus.onClicked.addListener(function (info, tab) {
-  switch (info.menuItemId) {
-    case "parent":
-      try {
-        if (tab?.url) {
-          const { url } = tab;
-          console.log(JSON.stringify(url));
-          if (url.includes("instagram.com")) {
-            getInstagramProfilePicture(url);
-          } else if (url.includes("tiktok.com")) {
-            getTiktokProfilePicture(url);
-          }
-        } else {
-          console.error("Tab or URL is undefined");
-        }
-      } catch (error) {
-        console.error("error:genericOnClick: ", error);
-      }
-      break;
-    default:
-      console.error("error:contextMenus-onClicked");
+chrome.action.onClicked.addListener(async () => {
+  try {
+    const tab = await getCurrentTab();
+    console.log(`download: ${tab.url}`);
+    await handleProfilePicture(tab.url, { download: true });
+  } catch (error) {
+    console.error("error:onClicked:", error);
   }
 });
 
-//MARK:Instagram
-function getInstagramProfilePicture(url) {
-  getInstagramUser(url).then(getInstagramUserId).then(openInstagramFullHDPhoto);
-}
-
-function oneClickSaveProfilePictureIG(url) {
-  getInstagramUser(url)
-    .then(getInstagramUserId)
-    .then(downloadInstagramFullHDPhoto);
-}
-
-function getInstagramUser(link) {
-  return new Promise((resolve, reject) => {
-    let regex = /(?<=instagram.com\/)[A-Za-z0-9_.]+/;
-    let match = link.match(regex);
-    if (match) {
-      let username = match[0];
-      resolve(username);
+//MARK:Context menu
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId !== "parent") {
+    console.error("error:contextMenus-onClicked");
+    return;
+  }
+  try {
+    if (!tab?.url) {
+      console.error("Tab or URL is undefined");
+      return;
     }
-  });
-}
+    await handleProfilePicture(tab.url, { download: false });
+  } catch (error) {
+    console.error("error:genericOnClick:", error);
+  }
+});
 
-function getInstagramUserId(username) {
-  return new Promise((resolve, reject) => {
-    let url = `https://i.instagram.com/api/v1/users/web_profile_info/?username=${username}`;
-    modifyHeaders(
-      "Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 105.0.0.11.118 (iPhone11,8; iOS 12_3_1; en_US; en-US; scale=2.00; 828x1792; 165586599)"
-    );
-
-    fetch(url)
-      .then((res) => res.json())
-      .then((out) => resolve(out.data.user.id));
-  });
-}
-
+// Applies a dynamic User-Agent override. Returns a promise so callers can
+// await it and guarantee the rule is active before the request fires.
 function modifyHeaders(headerStr) {
-  chrome.declarativeNetRequest.updateDynamicRules({
+  return chrome.declarativeNetRequest.updateDynamicRules({
     removeRuleIds: [1],
     addRules: [
       {
@@ -108,11 +66,7 @@ function modifyHeaders(headerStr) {
         action: {
           type: "modifyHeaders",
           requestHeaders: [
-            {
-              header: "User-Agent",
-              operation: "set",
-              value: headerStr,
-            },
+            { header: "User-Agent", operation: "set", value: headerStr },
           ],
         },
         condition: {
@@ -124,120 +78,80 @@ function modifyHeaders(headerStr) {
   });
 }
 
-function openInstagramFullHDPhoto(instagram_user_id) {
-  return new Promise((resolve, reject) => {
-    modifyHeaders(
-      "Mozilla/5.0 (Linux; Android 9; GM1903 Build/PKQ1.190110.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/75.0.3770.143 Mobile Safari/537.36 Instagram 103.1.0.15.119 Android (28/9; 420dpi; 1080x2260; OnePlus; GM1903; OnePlus7; qcom; sv_SE; 164094539)"
-    );
-    let url = `https://i.instagram.com/api/v1/users/${instagram_user_id}/info/`;
+//MARK:Instagram
+async function handleInstagram(url, { download }) {
+  const username = parseInstagramUsername(url);
+  const userId = await getInstagramUserId(username);
+  const user = await getInstagramUserInfo(userId);
+  const imageUrl = user.hd_profile_pic_url_info.url;
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((out) => {
-        let url = out.user.hd_profile_pic_url_info.url;
-        chrome.tabs.create({ url });
-        resolve(url);
-      });
-  });
+  if (download) {
+    chrome.downloads.download({
+      url: imageUrl,
+      filename: `${user.username}.jpg`,
+      saveAs: false,
+    });
+  } else {
+    chrome.tabs.create({ url: imageUrl });
+  }
 }
 
-function downloadInstagramFullHDPhoto(instagram_user_id) {
-  return new Promise((resolve, reject) => {
-    modifyHeaders(
-      "Mozilla/5.0 (Linux; Android 9; GM1903 Build/PKQ1.190110.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/75.0.3770.143 Mobile Safari/537.36 Instagram 103.1.0.15.119 Android (28/9; 420dpi; 1080x2260; OnePlus; GM1903; OnePlus7; qcom; sv_SE; 164094539)"
-    );
-    let url = `https://i.instagram.com/api/v1/users/${instagram_user_id}/info/`;
+function parseInstagramUsername(link) {
+  const match = link.match(/(?<=instagram\.com\/)[A-Za-z0-9_.]+/);
+  if (!match) throw new Error(`Could not parse Instagram username from: ${link}`);
+  return match[0];
+}
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((out) => {
-        let imageUrl = out.user.hd_profile_pic_url_info.url;
+async function getInstagramUserId(username) {
+  await modifyHeaders(IG_UA_IPHONE);
+  const url = `https://i.instagram.com/api/v1/users/web_profile_info/?username=${username}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`IG web_profile_info failed: ${res.status}`);
+  const out = await res.json();
+  return out.data.user.id;
+}
 
-        chrome.downloads.download({
-          url: imageUrl,
-          filename: `${out.user.username}.jpg`,
-          saveAs: false,
-        });
-
-        resolve(imageUrl);
-      })
-      .catch((error) => reject(error));
-  });
+async function getInstagramUserInfo(userId) {
+  await modifyHeaders(IG_UA_ANDROID);
+  const url = `https://i.instagram.com/api/v1/users/${userId}/info/`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`IG user info failed: ${res.status}`);
+  const out = await res.json();
+  return out.user;
 }
 
 //MARK:Tiktok
-function getTiktokProfilePicture(url) {
-  getTiktokUsername(url)
-    .then(getTiktokProfilePictureUrl)
-    .then(openTiktokFullHDPhoto);
+async function handleTiktok(url, { download }) {
+  const username = parseTiktokUsername(url);
+  const pictureUrl = await getTiktokProfilePictureUrl(username);
+
+  if (download) {
+    chrome.downloads.download({
+      url: pictureUrl,
+      filename: `${username.replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`,
+      saveAs: false,
+    });
+  } else {
+    chrome.tabs.create({ url: pictureUrl });
+  }
 }
 
-function oneClickSaveProfilePictureTiktok(url) {
-  getTiktokUsername(url)
-    .then(getTiktokProfilePictureUrl)
-    .then(downloadTiktokFullHDPhoto);
+function parseTiktokUsername(link) {
+  const match = link.match(/(?<=tiktok\.com\/)@[a-zA-Z0-9.]*/);
+  if (!match) throw new Error(`Could not parse TikTok username from: ${link}`);
+  console.log("TikTok Username: " + match[0]);
+  return match[0];
 }
 
-function getTiktokUsername(link) {
-  return new Promise((resolve, reject) => {
-    let regex = /(?<=tiktok.com\/)@[a-zA-z0-9.]*/;
-    let username = link.match(regex)[0];
-    console.log("TikTok Username: " + username);
-    tiktokProfile = username;
-    resolve(username);
-  });
-}
+async function getTiktokProfilePictureUrl(username) {
+  const res = await fetch(`https://www.tiktok.com/${username}`);
+  if (!res.ok) throw new Error(`TikTok page fetch failed: ${res.status}`);
+  const html = await res.text();
 
-function getTiktokProfilePictureUrl(username) {
-  return new Promise((resolve, reject) => {
-    let url = `https://www.tiktok.com/${username}`;
-    fetch(url)
-      .then((response) => {
-        return response.text();
-      })
-      .then((html) => {
-        let regex = /(?<=avatarLarger":").+?(?=","avatarMedium)/;
-        let profile_picture_encoded = html.match(regex)[0];
-        let profile_picture_url = decodeURIComponent(
-          JSON.parse(`"${profile_picture_encoded}"`)
-        );
-        console.log(profile_picture_url);
-        resolve(profile_picture_url);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject(err);
-      });
-  });
-}
+  const match = html.match(/(?<=avatarLarger":").+?(?=","avatarMedium)/);
+  if (!match) throw new Error("Could not find TikTok avatar in page HTML");
 
-function openTiktokFullHDPhoto(url) {
-  return new Promise((resolve, reject) => {
-    openTab(url);
-    resolve(url);
-  });
-}
-
-function downloadTiktokFullHDPhoto(url) {
-  return new Promise((resolve, reject) => {
-    fetch(url)
-      .then((out) => {
-        chrome.downloads.download(
-          {
-            url: url,
-            filename: `${tiktokProfile.replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`,
-            saveAs: false,
-          },
-          () => {
-            resolve(url);
-            tiktokProfile = "";
-          }
-        );
-      })
-      .catch((error) => reject(error));
-  });
-}
-
-function openTab(url) {
-  chrome.tabs.create({ url: url });
+  const pictureUrl = decodeURIComponent(JSON.parse(`"${match[0]}"`));
+  console.log(pictureUrl);
+  return pictureUrl;
 }
