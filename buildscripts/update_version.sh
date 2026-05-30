@@ -16,7 +16,7 @@ fi
 
 IFS='.' read -r -a version_parts <<< "$current_version"
 
-((version_parts[1]++))
+((version_parts[2]++))
 
 new_version=$(IFS='.'; echo "${version_parts[*]}")
 
