@@ -9,7 +9,6 @@
   "author": "Eclipse-Walker",
   "permissions": [
     "contextMenus",
-    "cookies",
     "declarativeNetRequest",
     "downloads",
     "scripting",

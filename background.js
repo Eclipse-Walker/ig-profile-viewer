@@ -167,7 +167,10 @@ async function getInstagramHDViaGraphQL(profile, tabId) {
     target: { tabId },
     args: [{ docId: IG_PROFILE_DOC_ID, userId: String(profile.id) }],
     func: async ({ docId, userId }) => {
-      const html = document.documentElement.innerHTML;
+      // Tokens/version params live only in inline <script> JSON. Scanning those
+      // is far cheaper than serialising the whole rendered DOM via innerHTML.
+      let html = "";
+      for (const s of document.scripts) html += s.textContent;
       const pick = (re) => html.match(re)?.[1];
 
       const fbDtsg = pick(/"DTSGInitialData",\[\],\{"token":"([^"]+)"/);
