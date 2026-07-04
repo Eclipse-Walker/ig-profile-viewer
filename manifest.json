@@ -9,8 +9,10 @@
   "author": "Eclipse-Walker",
   "permissions": [
     "contextMenus",
+    "cookies",
     "declarativeNetRequest",
     "downloads",
+    "scripting",
     "tabs"
   ],
   "declarative_net_request": {

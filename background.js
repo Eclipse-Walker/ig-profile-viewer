@@ -17,12 +17,12 @@ async function getCurrentTab() {
   return tab;
 }
 
-// Routes a tab URL to the matching platform handler.
-async function handleProfilePicture(url, { download }) {
-  if (url.includes("instagram.com")) {
-    await handleInstagram(url, { download });
-  } else if (url.includes("tiktok.com")) {
-    await handleTiktok(url, { download });
+// Routes a tab to the matching platform handler.
+async function handleProfilePicture(tab, { download }) {
+  if (tab.url.includes("instagram.com")) {
+    await handleInstagram(tab, { download });
+  } else if (tab.url.includes("tiktok.com")) {
+    await handleTiktok(tab.url, { download });
   }
 }
 
@@ -31,7 +31,7 @@ chrome.action.onClicked.addListener(async () => {
   try {
     const tab = await getCurrentTab();
     console.log(`download: ${tab.url}`);
-    await handleProfilePicture(tab.url, { download: true });
+    await handleProfilePicture(tab, { download: true });
   } catch (error) {
     console.error("error:onClicked:", error);
   }
@@ -48,7 +48,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       console.error("Tab or URL is undefined");
       return;
     }
-    await handleProfilePicture(tab.url, { download: false });
+    await handleProfilePicture(tab, { download: false });
   } catch (error) {
     console.error("error:genericOnClick:", error);
   }
@@ -79,10 +79,10 @@ function modifyHeaders(headerStr) {
 }
 
 //MARK:Instagram
-async function handleInstagram(url, { download }) {
-  const username = parseInstagramUsername(url);
+async function handleInstagram(tab, { download }) {
+  const username = parseInstagramUsername(tab.url);
   const profile = await getInstagramWebProfile(username);
-  const imageUrl = await resolveInstagramImageUrl(profile);
+  const imageUrl = await resolveInstagramImageUrl(profile, tab.id);
 
   if (!imageUrl) {
     console.error("[IG] could not resolve image url; profile:", JSON.stringify(profile));
@@ -120,10 +120,17 @@ async function getInstagramWebProfile(username) {
   return user;
 }
 
-// Prefers the full-resolution image from the private mobile /info/ endpoint,
-// but falls back to the URLs already present in the web profile when /info/
-// is unavailable (e.g. private accounts or API changes).
-async function resolveInstagramImageUrl(profile) {
+// Tries the highest-res source first and falls back down the chain:
+//   1. IG's own web GraphQL (true 1080px "www" image, needs an active IG login)
+//   2. Private mobile /info/ endpoint (1080px but often center-cropped)
+//   3. URLs already present in the web profile (last resort, ~320px)
+async function resolveInstagramImageUrl(profile, tabId) {
+  try {
+    const hd = await getInstagramHDViaGraphQL(profile, tabId);
+    if (hd) return hd;
+  } catch (error) {
+    console.warn("[IG] GraphQL HD lookup failed, falling back:", error);
+  }
   try {
     const info = await getInstagramUserInfo(profile.id);
     const hd = info?.hd_profile_pic_url_info?.url;
@@ -141,6 +148,99 @@ async function getInstagramUserInfo(userId) {
   if (!res.ok) throw new Error(`IG user info failed: ${res.status}`);
   const out = await res.json();
   return out.user;
+}
+
+// doc_id for IG's internal "PolarisProfilePageContentQuery" persisted GraphQL
+// query. Meta rotates this whenever the web JS bundle redeploys, with no
+// warning, so this is expected to break periodically — that's fine, the
+// caller just falls back to the lower-res mobile API.
+const IG_PROFILE_DOC_ID = "26672929172408668";
+
+// Requires an active Instagram login. The whole request runs INSIDE the IG tab
+// (via scripting.executeScript), so it inherits the page's own origin, referer,
+// cookies and session tokens — a service-worker fetch gets rejected by IG's
+// session-integrity check (error 1357004). Version params (__rev/__spin_*/__hs)
+// are scraped from the page to satisfy that same check; missing ones are omitted.
+async function getInstagramHDViaGraphQL(profile, tabId) {
+  if (!tabId) throw new Error("No tab id for IG GraphQL request");
+  const [{ result } = {}] = await chrome.scripting.executeScript({
+    target: { tabId },
+    args: [{ docId: IG_PROFILE_DOC_ID, userId: String(profile.id) }],
+    func: async ({ docId, userId }) => {
+      const html = document.documentElement.innerHTML;
+      const pick = (re) => html.match(re)?.[1];
+
+      const fbDtsg = pick(/"DTSGInitialData",\[\],\{"token":"([^"]+)"/);
+      const lsd = pick(/"LSD",\[\],\{"token":"([^"]+)"/);
+      const csrftoken = document.cookie.match(/csrftoken=([^;]+)/)?.[1];
+      if (!fbDtsg || !lsd || !csrftoken) {
+        return { error: "missing tokens", hasDtsg: !!fbDtsg, hasLsd: !!lsd, hasCsrf: !!csrftoken };
+      }
+
+      let jz = 0;
+      for (const ch of fbDtsg) jz += ch.charCodeAt(0);
+
+      const body = new URLSearchParams({
+        av: "17841406999930309",
+        __a: "1",
+        __comet_req: "7",
+        fb_dtsg: fbDtsg,
+        jazoest: `2${jz}`,
+        lsd,
+        fb_api_caller_class: "RelayModern",
+        fb_api_req_friendly_name: "PolarisProfilePageContentQuery",
+        variables: JSON.stringify({
+          enable_integrity_filters: true,
+          id: userId,
+          __relay_internal__pv__PolarisCannesGuardianExperienceEnabledrelayprovider: true,
+          __relay_internal__pv__PolarisCASB976ProfileEnabledrelayprovider: false,
+          __relay_internal__pv__PolarisWebSchoolsEnabledrelayprovider: false,
+          __relay_internal__pv__PolarisRepostsConsumptionEnabledrelayprovider: false,
+        }),
+        server_timestamps: "true",
+        doc_id: docId,
+      });
+
+      const version = [
+        ["__rev", /"(?:__spin_r|spin_r|server_revision|client_revision)":(\d+)/],
+        ["__spin_r", /"(?:__spin_r|spin_r|server_revision|client_revision)":(\d+)/],
+        ["__spin_b", /"(?:__spin_b|spin_b)":"([^"]+)"/],
+        ["__spin_t", /"(?:__spin_t|spin_t)":(\d+)/],
+        ["__hs", /"(?:__hs|haste_session)":"([^"]+)"/],
+        ["__hsi", /"(?:__hsi|hsi)":"?(\d+)"?/],
+      ];
+      for (const [key, re] of version) {
+        const v = html.match(re)?.[1];
+        if (v) body.set(key, v);
+      }
+
+      const res = await fetch("/api/graphql", {
+        method: "POST",
+        headers: {
+          "content-type": "application/x-www-form-urlencoded",
+          "x-fb-friendly-name": "PolarisProfilePageContentQuery",
+          "x-fb-lsd": lsd,
+          "x-csrftoken": csrftoken,
+          "x-ig-app-id": "936619743392459",
+          "x-asbd-id": "359341",
+        },
+        body: body.toString(),
+      });
+      const text = await res.text();
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        return { error: "bad json", status: res.status, snippet: text.slice(0, 200) };
+      }
+      const url = json?.data?.user?.hd_profile_pic_url_info?.url;
+      if (url) return { url };
+      return { error: "no url", igError: json?.error, igSummary: json?.errorSummary };
+    },
+  });
+
+  if (result?.url) return result.url;
+  throw new Error(`IG GraphQL: ${JSON.stringify(result)}`);
 }
 
 //MARK:Tiktok
