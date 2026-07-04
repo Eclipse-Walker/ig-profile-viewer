@@ -24,7 +24,13 @@ Open a profile page on a supported platform (e.g. `https://www.instagram.com/<us
   - **Left-click the extension icon** in the toolbar to **download** the full-size profile picture directly.
   - **Right-click the page and choose "IG Profile Viewer"** from the context menu to **open** the full-size profile picture in a new tab.
 
-For Instagram, the extension fetches the highest-resolution image available, automatically falling back to the public web profile picture when the high-res endpoint is unavailable (for example, on private accounts).
+For Instagram, the extension resolves the sharpest image it can, walking down a fallback chain until one works:
+
+1. **Instagram web GraphQL** — the true 1080×1080 "www" original. This runs inside the open Instagram tab and reuses your logged-in session, so **you must be signed in to Instagram** in that browser for this tier to fire.
+2. **Private mobile `/info/` endpoint** — 1080px, but Instagram may return a center-cropped variant.
+3. **Public web profile picture** — the ~320px image, always available (used as a last resort and for private accounts).
+
+If a higher tier fails (not logged in, Instagram rotated its internal query id, etc.) the extension silently drops to the next one, so it always returns *something*.
 
 
 ## Installation
@@ -50,16 +56,23 @@ Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (K
 ```
 ---
 
-## ⚙️How to build package
-#### Grant Execution Permission
-Open terminal and give execution permission to the script:
+## ⚙️How to build
 
-Bash `chmod +x buildscripts/build_package.sh`
+#### Unpacked folder (for local development / Load unpacked)
+Builds `package/ig-profile-viewer-<version>/` without zipping — point `chrome://extensions` → **Load unpacked** at that folder:
 
-#### Build Package
-Run the script with the command:
+```bash
+bash buildscripts/build_unpacked.sh
+```
 
-Bash `bash buildscripts/build_package.sh`
+#### Zipped package (for Chrome Web Store upload)
+Builds `package/ig-profile-viewer-<version>.zip`:
+
+```bash
+bash buildscripts/build_package.sh
+```
+
+> On first run, grant execution permission with `chmod +x buildscripts/*.sh`.
 
 ---
 
