@@ -1,0 +1,10 @@
+# Exclude development and repository configuration files from release ZIPs
+.gitignore export-ignore
+.gitattributes export-ignore
+.github/ export-ignore
+.claude/ export-ignore
+build/ export-ignore
+buildscripts/ export-ignore
+legacy/ export-ignore
+package/ export-ignore
+showcases/ export-ignore
