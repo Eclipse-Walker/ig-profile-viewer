@@ -1,7 +1,7 @@
 [![Update Version](https://github.com/Eclipse-Walker/ig-profile-viewer/actions/workflows/update-version.yml/badge.svg)](https://github.com/Eclipse-Walker/ig-profile-viewer/actions/workflows/update-version.yml)
 [![Bump Version](https://github.com/Eclipse-Walker/ig-profile-viewer/actions/workflows/bump-version.yml/badge.svg)](https://github.com/Eclipse-Walker/ig-profile-viewer/actions/workflows/bump-version.yml)
 
-## IG Profile Viewer ⭐️⭐️⭐️⭐️⭐️
+## IG Profile Viewer
 
 IG Profile Viewer: Conveniently View & Download Instagram and TikTok Profile Pictures
 If you enjoy exploring Instagram and TikTok profiles and want to see profile pictures in full size without using external tools, IG Profile Viewer is the solution you’ve been looking for!

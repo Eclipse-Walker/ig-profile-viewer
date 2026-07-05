@@ -10,9 +10,8 @@ else
   rm -rf package/*
 fi
 
-files_to_zip=("icons" "background.js" "manifest.json" "rule.json" "rules.json")
+files_to_zip=("icons" "background.js" "manifest.json" "rules.json")
 
 zip -r "package/$zipfile" "${files_to_zip[@]}"
 
 echo "Zipping complete! Created package/$zipfile"
-

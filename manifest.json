@@ -20,11 +20,6 @@
         "id": "ruleset_1",
         "enabled": true,
         "path": "rules.json"
-      },
-      {
-        "id": "ruleset_2",
-        "enabled": true,
-        "path": "rule.json"
       }
     ]
   },

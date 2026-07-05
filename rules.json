@@ -14,11 +14,7 @@
     },
     "condition": {
       "urlFilter": "https://i.instagram.com/api/v1/users/*",
-      "resourceTypes": [
-        "main_frame",
-        "script",
-        "sub_frame"
-      ]
+      "resourceTypes": ["main_frame", "script", "sub_frame", "xmlhttprequest"]
     }
   }
 ]

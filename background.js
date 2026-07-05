@@ -71,7 +71,12 @@ function modifyHeaders(headerStr) {
         },
         condition: {
           urlFilter: "https://i.instagram.com/api/v1/users/*",
-          resourceTypes: ["main_frame", "script", "sub_frame"],
+          resourceTypes: [
+            "main_frame",
+            "script",
+            "sub_frame",
+            "xmlhttprequest",
+          ],
         },
       },
     ],
@@ -85,7 +90,10 @@ async function handleInstagram(tab, { download }) {
   const imageUrl = await resolveInstagramImageUrl(profile, tab.id);
 
   if (!imageUrl) {
-    console.error("[IG] could not resolve image url; profile:", JSON.stringify(profile));
+    console.error(
+      "[IG] could not resolve image url; profile:",
+      JSON.stringify(profile),
+    );
     throw new Error("Could not resolve Instagram profile picture URL");
   }
 
@@ -102,7 +110,8 @@ async function handleInstagram(tab, { download }) {
 
 function parseInstagramUsername(link) {
   const match = link.match(/(?<=instagram\.com\/)[A-Za-z0-9_.]+/);
-  if (!match) throw new Error(`Could not parse Instagram username from: ${link}`);
+  if (!match)
+    throw new Error(`Could not parse Instagram username from: ${link}`);
   return match[0];
 }
 
@@ -136,7 +145,10 @@ async function resolveInstagramImageUrl(profile, tabId) {
     const hd = info?.hd_profile_pic_url_info?.url;
     if (hd) return hd;
   } catch (error) {
-    console.warn("[IG] /info/ lookup failed, falling back to web profile:", error);
+    console.warn(
+      "[IG] /info/ lookup failed, falling back to web profile:",
+      error,
+    );
   }
   return profile.profile_pic_url_hd || profile.profile_pic_url;
 }
@@ -177,7 +189,12 @@ async function getInstagramHDViaGraphQL(profile, tabId) {
       const lsd = pick(/"LSD",\[\],\{"token":"([^"]+)"/);
       const csrftoken = document.cookie.match(/csrftoken=([^;]+)/)?.[1];
       if (!fbDtsg || !lsd || !csrftoken) {
-        return { error: "missing tokens", hasDtsg: !!fbDtsg, hasLsd: !!lsd, hasCsrf: !!csrftoken };
+        return {
+          error: "missing tokens",
+          hasDtsg: !!fbDtsg,
+          hasLsd: !!lsd,
+          hasCsrf: !!csrftoken,
+        };
       }
 
       let jz = 0;
@@ -205,8 +222,14 @@ async function getInstagramHDViaGraphQL(profile, tabId) {
       });
 
       const version = [
-        ["__rev", /"(?:__spin_r|spin_r|server_revision|client_revision)":(\d+)/],
-        ["__spin_r", /"(?:__spin_r|spin_r|server_revision|client_revision)":(\d+)/],
+        [
+          "__rev",
+          /"(?:__spin_r|spin_r|server_revision|client_revision)":(\d+)/,
+        ],
+        [
+          "__spin_r",
+          /"(?:__spin_r|spin_r|server_revision|client_revision)":(\d+)/,
+        ],
         ["__spin_b", /"(?:__spin_b|spin_b)":"([^"]+)"/],
         ["__spin_t", /"(?:__spin_t|spin_t)":(\d+)/],
         ["__hs", /"(?:__hs|haste_session)":"([^"]+)"/],
@@ -234,11 +257,19 @@ async function getInstagramHDViaGraphQL(profile, tabId) {
       try {
         json = JSON.parse(text);
       } catch {
-        return { error: "bad json", status: res.status, snippet: text.slice(0, 200) };
+        return {
+          error: "bad json",
+          status: res.status,
+          snippet: text.slice(0, 200),
+        };
       }
       const url = json?.data?.user?.hd_profile_pic_url_info?.url;
       if (url) return { url };
-      return { error: "no url", igError: json?.error, igSummary: json?.errorSummary };
+      return {
+        error: "no url",
+        igError: json?.error,
+        igSummary: json?.errorSummary,
+      };
     },
   });
 

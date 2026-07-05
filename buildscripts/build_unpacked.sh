@@ -8,7 +8,7 @@ outdir="package/ig-profile-viewer-$version"
 rm -rf "$outdir"
 mkdir -p "$outdir"
 
-files=("icons" "background.js" "manifest.json" "rule.json" "rules.json")
+files=("icons" "background.js" "manifest.json" "rules.json")
 cp -r "${files[@]}" "$outdir/"
 
 echo "Build complete! Unpacked extension at $outdir"
