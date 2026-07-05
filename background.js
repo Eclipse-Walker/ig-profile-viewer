@@ -33,24 +33,24 @@ chrome.action.onClicked.addListener(async () => {
     console.log(`download: ${tab.url}`);
     await handleProfilePicture(tab, { download: true });
   } catch (error) {
-    console.error("error:onClicked:", error);
+    console.warn("error:onClicked:", error);
   }
 });
 
 //MARK:Context menu
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId !== "parent") {
-    console.error("error:contextMenus-onClicked");
+    console.warn("error:contextMenus-onClicked");
     return;
   }
   try {
     if (!tab?.url) {
-      console.error("Tab or URL is undefined");
+      console.warn("Tab or URL is undefined");
       return;
     }
     await handleProfilePicture(tab, { download: false });
   } catch (error) {
-    console.error("error:genericOnClick:", error);
+    console.warn("error:genericOnClick:", error);
   }
 });
 
@@ -90,7 +90,7 @@ async function handleInstagram(tab, { download }) {
   const imageUrl = await resolveInstagramImageUrl(profile, tab.id);
 
   if (!imageUrl) {
-    console.error(
+    console.warn(
       "[IG] could not resolve image url; profile:",
       JSON.stringify(profile),
     );
