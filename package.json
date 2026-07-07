@@ -1,0 +1,12 @@
+{
+  "name": "ig-profile-viewer",
+  "description": "Chrome extension to view & download Instagram and TikTok profile pictures in full size.",
+  "author": "Eclipse-Walker",
+  "homepage": "https://github.com/Eclipse-Walker/ig-profile-viewer",
+  "private": true,
+  "scripts": {
+    "build": "bash buildscripts/build_min.sh",
+    "build:zip": "bash buildscripts/build_package.sh",
+    "build:dev": "bash buildscripts/build_unpacked.sh"
+  }
+}
