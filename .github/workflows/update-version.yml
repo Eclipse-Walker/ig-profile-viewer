@@ -12,6 +12,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # Default GITHUB_TOKEN pushes as github-actions[bot], which has no
+          # role and can't satisfy a role-based ruleset bypass (e.g. "Repository
+          # admin"). Using a PAT from an actual admin account makes the push
+          # authenticate as that user instead, so the bypass applies.
+          token: ${{ secrets.ADMIN_PAT }}
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -35,5 +41,3 @@ jobs:
           git add manifest.json
           git commit -m "${{ env.NEW_VERSION }}"
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
