@@ -39,5 +39,9 @@ jobs:
       - name: Commit and push changes
         run: |
           git add manifest.json
-          git commit -m "${{ env.NEW_VERSION }}"
+          # [skip ci] tells GitHub to skip triggering ANY workflow (including
+          # this one and create-tag.yml) for this push. Without it, pushing
+          # with ADMIN_PAT (a real user, unlike GITHUB_TOKEN) re-triggers
+          # update-version.yml on its own commit — infinite version-bump loop.
+          git commit -m "${{ env.NEW_VERSION }} [skip ci]"
           git push
